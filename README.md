@@ -16,8 +16,10 @@ University: The University of Nevada, Las Vegas
 
 ## Machine Pre-Requisites
 * kernal with mptcp
-* mininet (installed with python3)
-* iperf3
+* Python3
+* pipenv
+* Mininet (installed with python3)
+* Iperf3
 
 ## MPTCP Configurations
 
