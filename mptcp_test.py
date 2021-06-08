@@ -68,7 +68,7 @@ def under_testing():
     '''
     time.sleep(TEST_DURATION/3.0)
     if CUT_LINK:
-        print('cutting link...\n')
+        print('cutting link...')
         print(h1.intf('h1-eth0').ifconfig('down'))
         print('link down\n')
     time.sleep(TEST_DURATION/3.0)
@@ -84,24 +84,24 @@ def under_testing():
     time.sleep(5)  # wait (a bit) to finish
 
 
-test_started_timestamp = time.time()
-print('STARTING')
+def start_test():
+    ''' start iperf3 test '''
 
-print('starting iperf server at', h2.IP())
-h2.cmd('iperf3 -s -i 1.0 > iperf_bandwith_server_log.txt &')
+    print('starting iperf server at', h2.IP())
+    h2.cmd('iperf3 -s -i 1.0 > iperf_bandwith_server_log.txt &')
 
-print('starting iperf client at', h1.IP(), ', connect to ', h2.IP())
-h1.cmd('iperf3 -t ' + str(TEST_DURATION) + ' -i 1.0 -c ' + h2.IP() +
-       ' > iperf_bandwith_client_log.txt &')
+    print('starting iperf client at', h1.IP(), ', connect to ', h2.IP())
+    h1.cmd('iperf3 -t ' + str(TEST_DURATION) + ' -i 1.0 -c ' + h2.IP() +
+           ' > iperf_bandwith_client_log.txt &')
 
-under_testing()
+    under_testing()
 
-print('iperf client response:')
-print(h1.cmd('cat iperf_bandwith_client_log.txt'))
+    print('iperf client response:')
+    print(h1.cmd('cat iperf_bandwith_client_log.txt'))
 
-print('iperf server response:')
-print(h2.cmd('cat iperf_bandwith_server_log.txt'))
+    print('iperf server response:')
+    print(h2.cmd('cat iperf_bandwith_server_log.txt'))
 
+
+start_test()
 net.stop()
-
-print('\n')
