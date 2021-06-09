@@ -14,12 +14,26 @@ University: The University of Nevada, Las Vegas
 
 ## Overview
 
+(TODO)
+
 ## Machine Pre-Requisites
 * kernal with mptcp
 * Python3
 * pipenv
 * Mininet (installed with python3)
 * Iperf3
+
+## Running Plotter.py
+
+Install pipenv (if not installed): ```python3 -m pip install pipenv```
+
+Start virtual environment: ```pipenv shell```
+
+Install python modules: ```pipenv install```
+
+Run test: ```sudo python plotter.py  # Mininet requires root privileges```
+
+Plotter.py is responsible for setting the congestion algorithm, scheduler and path manager. Then it calls mptcp_test.py to start the iperf3 test.
 
 ## MPTCP Configurations
 
