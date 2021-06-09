@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 mininet = "*"
+plotly = "*"
 
 [dev-packages]
 
