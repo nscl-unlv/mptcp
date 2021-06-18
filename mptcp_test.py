@@ -88,10 +88,10 @@ def start_test():
     ''' start iperf3 test '''
 
     print('starting iperf server at', h2.IP())
-    h2.cmd('iperf3 -s -i 1.0 > iperf_bandwith_server_log.txt &')
+    h2.cmd('iperf3 -s -i 1.0 -f m > iperf_bandwith_server_log.txt &')
 
     print('starting iperf client at', h1.IP(), ', connect to ', h2.IP())
-    h1.cmd('iperf3 -t ' + str(TEST_DURATION) + ' -i 1.0 -c ' + h2.IP() +
+    h1.cmd('iperf3 -t ' + str(TEST_DURATION) + ' -f m -i 1.0 -c ' + h2.IP() +
            ' > iperf_bandwith_client_log.txt &')
 
     under_testing()
