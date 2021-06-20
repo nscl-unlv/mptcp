@@ -1,14 +1,12 @@
 #!/usr/bin/gnuplot -c
 
-# TODO set title from args
-set title "MPTCP Bandwith from Iperf"
+set title ARG3
 
 set term png
-# TODO set file name from args
-set output "test.png"
+set output ARG2 
 
 set xlabel "seconds"
-set ylabel "Mbit/sec"
+set ylabel "Mbits/sec"
 
 set xrange [0:]
 set yrange [0:]
