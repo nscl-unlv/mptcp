@@ -29,7 +29,8 @@ clear_results() {
 
 execute_mptcp_test() {
     echo "executing mptcp_test.py..."
-    sudo python $ROOT/mptcp_test.py
+    PY3_CMD=$(which python3)
+    sudo $PY3_CMD $ROOT/mptcp_test.py
 }
 
 parse_iperf_files() {
