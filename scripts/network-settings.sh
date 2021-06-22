@@ -1,16 +1,15 @@
 #!/bin/bash
 
-
-# get all kernal runtime parameters
-RUNTIME_PARAMS=$(sudo sysctl -a)
+# shows tcp congestion control algorithm and mptcp settings
 
 # get congestion algorithm
 echo "Congestion Control Algorithm"
-echo "$RUNTIME_PARAMS" | grep net.ipv4.tcp_congestion_control
+sysctl net.ipv4.tcp_congestion_control
 echo ""
 
 # get mptcp settings
 echo "MPTCP Settings"
-echo "$RUNTIME_PARAMS" | grep net.mptcp
+sysctl net.mptcp.mptcp_enabled
+sysctl net.mptcp.mptcp_scheduler
+sysctl net.mptcp.mptcp_path_manager
 echo ""
-
