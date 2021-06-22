@@ -5,10 +5,15 @@
 ROOT=$(pwd)
 
 # get mptcp settings
-RUNTIME_PARAMS=$(sudo sysctl -a)
-CONGESTION_ALG=$(echo "$RUNTIME_PARAMS" | grep net.ipv4.tcp_congestion_control | cut -d= -f2 | awk '{print $1}')
-PATH_MANAGER=$(echo "$RUNTIME_PARAMS" | grep net.mptcp.mptcp_path_manager | cut -d= -f2 | awk '{print $1}')
-SCHEDULER=$(echo "$RUNTIME_PARAMS" | grep net.mptcp.mptcp_scheduler | cut -d= -f2 | awk '{print $1}')
+CONGESTION_ALG=$(sysctl net.ipv4.tcp_congestion_control | cut -d= -f2 | awk '{print $1}')
+PATH_MANAGER=$(sysctl net.mptcp.mptcp_path_manager | cut -d= -f2 | awk '{print $1}')
+SCHEDULER=$(sysctl net.mptcp.mptcp_scheduler | cut -d= -f2 | awk '{print $1}') # rbs = ProgMP
+
+# get ProgMP scheduler
+if [[ $SCHEDULER == "rbs" ]]; then
+    SCHEDULER=$(cat /proc/net/mptcp_net/rbs/default)
+    echo $PROGMP_SCHEDULER
+fi
 
 NEW_FILE_NAME="$SCHEDULER-$CONGESTION_ALG-$PATH_MANAGER"
 
