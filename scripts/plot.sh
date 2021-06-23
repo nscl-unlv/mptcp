@@ -1,5 +1,7 @@
 #!/usr/bin/gnuplot -c
 
+# GNUPLOT script file. Edit to change plot formatting.
+
 set title ARG3
 
 set term png

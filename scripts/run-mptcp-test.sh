@@ -1,9 +1,17 @@
 #!/bin/bash
 
+# The file does the following:
+# 1.) creates a results folder if not exist.
+# 2.) clears results folder (optional).
+# 3.) parses iperf log files.
+# 4.) creates gnuplot from log files.
+# 5.) moves all files to results folder.
+
 ################## Global Varibales #############
 
 ROOT=$(pwd)
 MPTCP_TEST="mptcp_test.py"
+CLEAR_RESULTS="N" # Y to clear results each run
 
 # get mptcp settings
 CONGESTION_ALG=$(sysctl net.ipv4.tcp_congestion_control | cut -d= -f2 | awk '{print $1}')
@@ -74,8 +82,9 @@ rename_server_logs() {
 main() {
     create_results_folder
 
-    # uncomment to empty results each run
-    #clear_results 
+    if [[ $CLEAR_RESULTS =~ yes|Y|y ]]; then
+        clear_results
+    fi
 
     # show current network settings
     ./scripts/network-settings.sh
