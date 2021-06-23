@@ -3,6 +3,7 @@
 ################## Global Varibales #############
 
 ROOT=$(pwd)
+MPTCP_TEST="mptcp_test.py"
 
 # get mptcp settings
 CONGESTION_ALG=$(sysctl net.ipv4.tcp_congestion_control | cut -d= -f2 | awk '{print $1}')
@@ -35,7 +36,7 @@ clear_results() {
 execute_mptcp_test() {
     echo "executing mptcp_test.py..."
     PY3_CMD=$(which python3)
-    sudo $PY3_CMD $ROOT/mptcp_test.py
+    sudo $PY3_CMD $ROOT/$MPTCP_TEST
 }
 
 parse_iperf_files() {
@@ -72,7 +73,9 @@ rename_server_logs() {
 
 main() {
     create_results_folder
-    clear_results
+
+    # uncomment to empty results each run
+    #clear_results 
 
     # show current network settings
     ./scripts/network-settings.sh
