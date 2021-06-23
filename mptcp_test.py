@@ -15,6 +15,11 @@ Test Prerequisites
 - set congestion control algorithm
 - set path manager
 - set scheduler
+
+Notes
+Do not add delay on the client (sender) links.  Mininet does not use TSQ small
+queues (TSQ), thus does not emulate MPTCP correctly.  Source: Mininet/Netem
+Emulation Pitfalls by Alexander Frommgen.
 """
 
 import time
@@ -32,21 +37,23 @@ TEST_DURATION = 24  # seconds
 net = Mininet(cleanup=True)
 
 # setup host, switch and controller
+# h1 -> client, h2 -> server
 h1 = net.addHost('h1', ip='10.0.1.1')
 h2 = net.addHost('h2', ip='10.0.2.1')
 s3 = net.addSwitch('s3')
 c0 = net.addController('c0')
 
 # add links to host-1
-net.addLink(h1, s3, cls=TCLink, bw=10, delay='10ms',
+# NOTE: do not add delay for client (sender) links
+net.addLink(h1, s3, cls=TCLink, bw=10,
             max_queue_size=MAX_QUEUE_SIZE)
-net.addLink(h1, s3, cls=TCLink, bw=10, delay='10ms',
+net.addLink(h1, s3, cls=TCLink, bw=10,
             max_queue_size=MAX_QUEUE_SIZE)
 
 # add links to host-2
-net.addLink(h2, s3, cls=TCLink, bw=10, delay='10ms',
+net.addLink(h2, s3, cls=TCLink, bw=10, delay='20ms',
             max_queue_size=MAX_QUEUE_SIZE)
-net.addLink(h2, s3, cls=TCLink, bw=10, delay='10ms',
+net.addLink(h2, s3, cls=TCLink, bw=10, delay='20ms',
             max_queue_size=MAX_QUEUE_SIZE)
 
 h1.setIP('10.0.1.1', intf='h1-eth0')
