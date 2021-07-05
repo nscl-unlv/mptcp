@@ -17,27 +17,42 @@ University: The University of Nevada, Las Vegas
 (TODO)
 
 ## Machine Pre-Requisites
-* kernal with mptcp
-* Python3
-* pipenv
-* Mininet (installed with python3)
-* Iperf3
+* [MPTCP](https://multipath-tcp.org): kernal with multi-path TCP
+* [Mininet](http://mininet.org): network simuluation. Ensure to install with python3
+* [ProgMP](https://progmp.net): create custom mptcp schedulers
+* Python3: for mininet api library
+* Python2: for loading ProgMP schedulers
+* [pipenv](https://pypi.org/project/pipenv): create virtual python environment
+* [Iperf3](https://iperf.fr): for bandwidth testing
 
-## Running Plotter.py
+## Project Structure
 
-Install pipenv (if not installed): ```python3 -m pip install pipenv```
+* **mptcp-tests/**: individual mininet test files.
+* **results/**: iperf logs and gnuplots images are moved to this after after each test.
+    - this folder will automatically be created when a running a test.
+* **scripts/**: utility bash scripts (i.e. show current scheduler)
+* **plots/**: folder to store gnuplots
 
-Start virtual environment: ```pipenv shell```
+## Running a MPTCP Test
 
-Install python modules: ```pipenv install```
+1. Install all pre-requisites.
+2. Ensure the kernel with ProgMP is loaded. Use `uname -r` to check the running kernel version v4.20.
+    - you can select the kernel version in the advance GRUB menu when the manchine is first starting.
+4. Start the virtual python virtual environment with `pipenv shell`.
+5. Install python libries with `pipenv istall`. This only needs to be done once. You may get a lock error, in that case use the option `--skip-lock`.
+6. While in the root directory, run the command `make run-test`.
+    - runs the test file `mptcp_test.py`
 
-Run test: ```sudo python plotter.py  # Mininet requires root privileges```
+## Available Make Commands
 
-Plotter.py is responsible for setting the congestion algorithm, scheduler and path manager. Then it calls mptcp_test.py to start the iperf3 test.
+* `make run-test`: Execute the Mininet test described in mptcp_test.py
+* `make reset-mn`: Resets mininet. Good to run this after every test.
+* `make reset-network`: Resets congestional algorithm, scheduler and path manager to cubic, default and full-mesh respectively.
+* `make clean`: Clears all files in the results directory.
 
 ## MPTCP Configurations
 
-Python commands to enable mptcp and set congestion control algorithm, path-manager & scheduler.
+Python commands to enable mptcp and set congestion *control algorithm*, *path-manager* & *scheduler*.
 
 ### enable mptcp
 ```
