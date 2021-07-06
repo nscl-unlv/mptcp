@@ -45,7 +45,7 @@ University: The University of Nevada, Las Vegas
 
 ## Available Make Commands
 
-* `make run-test`: Execute the Mininet test described in mptcp_test.py
+* `make run FILE=<test_file.py>`: Execute the Mininet test described in mptcp_test.py
 * `make reset-mn`: Resets mininet. Good to run this after every test.
 * `make reset-network`: Resets congestion algorithm, scheduler and path manager to cubic, default and full-mesh respectively.
 * `make clean`: Clears all files in the results directory.
