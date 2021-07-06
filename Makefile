@@ -1,6 +1,6 @@
 .PHONY: run
 run:
-	./scripts/run-mptcp-test.sh $(FILE)
+	./scripts/run-mininet-test.sh $(FILE)
 
 .PHONY: reset-mn
 reset-mn:
