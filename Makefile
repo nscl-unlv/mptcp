@@ -1,6 +1,6 @@
-.PHONY: run-test
-run-test:
-	./scripts/run-mptcp-test.sh
+.PHONY: run
+run:
+	./scripts/run-mptcp-test.sh $(FILE)
 
 .PHONY: reset-mn
 reset-mn:
