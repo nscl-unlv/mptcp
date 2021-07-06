@@ -40,14 +40,14 @@ University: The University of Nevada, Las Vegas
     - you can select the kernel version in the advance GRUB menu when the manchine is first starting.
 4. Start the virtual python virtual environment with `pipenv shell`.
 5. Install python libries with `pipenv istall`. This only needs to be done once. You may get a lock error, in that case use the option `--skip-lock`.
-6. While in the root directory, run the command `make run-test`.
-    - runs the test file `mptcp_test.py`
+6. While in the root directory, run the command `make run FILE=<test_file.py>`. This executes a single mininet test.
+    - <test_file.py> must exist in mininet-tests/
 
 ## Available Make Commands
 
 * `make run-test`: Execute the Mininet test described in mptcp_test.py
 * `make reset-mn`: Resets mininet. Good to run this after every test.
-* `make reset-network`: Resets congestional algorithm, scheduler and path manager to cubic, default and full-mesh respectively.
+* `make reset-network`: Resets congestion algorithm, scheduler and path manager to cubic, default and full-mesh respectively.
 * `make clean`: Clears all files in the results directory.
 
 ## MPTCP Configurations
