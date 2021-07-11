@@ -2,3 +2,4 @@ tags*
 *.txt
 results/
 test-data
+__pycache__

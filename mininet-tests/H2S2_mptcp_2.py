@@ -25,6 +25,7 @@ Emulation Pitfalls by Alexander Frommgen.
 
 import config
 import time
+from mininet.cli import CLI
 from mininet.net import Mininet
 from mininet.link import TCLink
 
@@ -40,23 +41,24 @@ s3 = net.addSwitch('s3')
 s4 = net.addSwitch('s4')
 
 # add links to host-1
-# NOTE: do not add delay for client (sender) links
+# NOTE: do not add delay  or bandwidth for client (sender) links
 net.addLink(h1, s3, cls=TCLink,
-            bw=config.BANDWIDTH,
+            # bw=config.BANDWIDTH,
             max_queue_size=config.MAX_QUEUE_SIZE)
+net.addLink(h1, s4, cls=TCLink,
+            # bw=config.BANDWIDTH,
+            max_queue_size=config.MAX_QUEUE_SIZE)
+
+# add links to host-2
 net.addLink(h2, s3, cls=TCLink,
             bw=config.BANDWIDTH,
             max_queue_size=config.MAX_QUEUE_SIZE,
             delay=config.DELAY)
-
-# add links to host-2
-net.addLink(h1, s4, cls=TCLink,
-            bw=config.BANDWIDTH,
-            max_queue_size=config.MAX_QUEUE_SIZE)
 net.addLink(h2, s4, cls=TCLink,
             bw=config.BANDWIDTH,
             max_queue_size=config.MAX_QUEUE_SIZE,
             delay=config.DELAY)
+# net.build()
 
 h1.setIP('10.0.1.1', intf='h1-eth0')
 h1.setIP('10.0.1.2', intf='h1-eth1')
@@ -64,9 +66,27 @@ h1.setIP('10.0.1.2', intf='h1-eth1')
 h2.setIP('10.0.2.1', intf='h2-eth0')
 h2.setIP('10.0.2.2', intf='h2-eth1')
 
-net.start()
+# routing rules client
+h1.cmd('ip route flush all proto static scope global')
+h1.cmd('ip rule add from 10.0.1.1 table 1')
+h1.cmd('ip rule add from 10.0.1.2 table 2')
 
-time.sleep(1)  # wait for net to startup (unless this, it might won't work...)
+h1.cmd('ip route add 10.0.1.0/24 dev h1-eth0 link table 1')
+h1.cmd('ip route add default via 10.0.1.1 dev h1-eth0 table 1')
+
+h1.cmd('ip route add 10.0.1.0/24 dev h1-eth1 link table 2')
+h1.cmd('ip route add default via 10.0.1.2 dev h1-eth1 table 2')
+
+# routing rules server
+h2.cmd('ip route flush all proto static scope global')
+h2.cmd('ip rule add from 10.0.2.1 table 1')
+h2.cmd('ip rule add from 10.0.2.2 table 2')
+
+h2.cmd('ip route add 10.0.2.0/24 dev h1-eth0 link table 1')
+h2.cmd('ip route add default via 10.0.2.1 dev h2-eth0 table 1')
+
+h2.cmd('ip route add 10.0.2.0/24 dev h1-eth1 link table 2')
+h2.cmd('ip route add default via 10.0.2.2 dev h2-eth1 table 2')
 
 
 def under_testing():
@@ -113,7 +133,8 @@ def start_test():
     print(h2.cmd('cat iperf_bandwith_server_log.txt'))
 
 
+net.start()
+time.sleep(1)  # wait for net to startup (unless this, it might won't work...)
 start_test()
-# for link in net.links:
-#     print(link)
+# CLI(net)
 net.stop()
