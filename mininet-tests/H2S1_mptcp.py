@@ -23,16 +23,10 @@ Emulation Pitfalls by Alexander Frommgen.
 """
 
 import time
+import config
 # import os
 from mininet.net import Mininet
 from mininet.link import TCLink
-
-
-# test control variables
-CUT_LINK = True
-ADD_LINK = True
-MAX_QUEUE_SIZE = 100
-TEST_DURATION = 24  # seconds
 
 net = Mininet(cleanup=True)
 
@@ -45,16 +39,18 @@ c0 = net.addController('c0')
 
 # add links to host-1
 # NOTE: do not add delay for client (sender) links
-net.addLink(h1, s3, cls=TCLink, bw=10,
-            max_queue_size=MAX_QUEUE_SIZE)
-net.addLink(h1, s3, cls=TCLink, bw=10,
-            max_queue_size=MAX_QUEUE_SIZE)
+net.addLink(h1, s3, cls=TCLink, 
+            bw=config.BANDWIDTH)
+net.addLink(h1, s3, cls=TCLink,
+            bw=config.BANDWIDTH)
 
 # add links to host-2
-net.addLink(h2, s3, cls=TCLink, bw=10, delay='20ms',
-            max_queue_size=MAX_QUEUE_SIZE)
-net.addLink(h2, s3, cls=TCLink, bw=10, delay='20ms',
-            max_queue_size=MAX_QUEUE_SIZE)
+net.addLink(h2, s3, cls=TCLink,
+            bw=config.BANDWIDTH, 
+            delay=config.DELAY)
+net.addLink(h2, s3, cls=TCLink,
+            bw=config.BANDWIDTH, 
+            delay=config.DELAY)
 
 h1.setIP('10.0.1.1', intf='h1-eth0')
 h1.setIP('10.0.1.2', intf='h1-eth1')
@@ -73,20 +69,21 @@ def under_testing():
         - remove a link
         - add a link
     '''
-    time.sleep(TEST_DURATION/3.0)
-    if CUT_LINK:
+    time.sleep(config.TEST_DURATION/3.0)
+    if config.CUT_LINK:
         print('cutting link...')
         print(h1.intf('h1-eth0').ifconfig('down'))
         print('link down\n')
-    time.sleep(TEST_DURATION/3.0)
-    if ADD_LINK:
+    time.sleep(config.TEST_DURATION/3.0)
+    if config.ADD_LINK:
         print('adding a new link...\n')
-        net.addLink(h1, s3, cls=TCLink, bw=10, delay='10ms',
-                    max_queue_size=MAX_QUEUE_SIZE)
+        net.addLink(h1, s3, cls=TCLink,
+                    bw=config.BANDWIDTH,
+                    delay=config.DELAY)
         s3.attach('s3-eth5')
         h1.setIP('10.0.1.3', intf='h1-eth2')
         print('link added\n')
-    time.sleep(TEST_DURATION/3.0)
+    time.sleep(config.TEST_DURATION/3.0)
 
     time.sleep(5)  # wait (a bit) to finish
 
@@ -98,8 +95,8 @@ def start_test():
     h2.cmd('iperf3 -s -i 1.0 -f m > iperf_bandwith_server_log.txt &')
 
     print('starting iperf client at', h1.IP(), ', connect to ', h2.IP())
-    h1.cmd('iperf3 -t ' + str(TEST_DURATION) + ' -f m -i 1.0 -c ' + h2.IP() +
-           ' > iperf_bandwith_client_log.txt &')
+    h1.cmd(f'iperf3 -t {str(config.TEST_DURATION)} -f m -i 1.0 '
+           f'-c {h2.IP()} > iperf_bandwith_client_log.txt &')
 
     under_testing()
 
