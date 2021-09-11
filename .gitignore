@@ -1,5 +1,6 @@
-tags*
 *.txt
+data
+tags*
 results/
 test-data
 __pycache__

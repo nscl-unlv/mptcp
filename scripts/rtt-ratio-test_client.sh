@@ -2,81 +2,135 @@
 
 # Script to run IPERF and TCPDUMP
 
-INTF_1="eno1"
-INTF_2="enp7s0"
-INTF_LO="lo" # test
-IP_LO="127.0.0.1"
+# HOW MANY ROUNDS PER TEST
+RUNS_PER_TEST=1
 
-# constants
+# interfaces and ip addresses
+INTF_1="eno1"
+IP_1="10.18.17.15"
+
+INTF_2="enp7s0"
+IP_2="10.18.18.15"
+
+IP_SERVER="10.18.17.140"
+
+INTF_LO="lo" # for testing
+IP_LO="127.0.0.1" # for testing
+
+# CONSTANTS
 PACKET_LOSS=0.1
-INTF1_RTT=10 
+INTF1_RTT="10ms"
+PRIMARY_PATH=$IP_1
 
 # delay settings for path 2
-INTF2_RTTS=(10 20 50)
-
-# RTT ratios
-RATIOS=(1 2 5)
+INTF2_RTTS=("10ms" "20ms" "50ms" "100ms" "200ms" "300ms" "500ms" "1000ms")
 
 # file sizes
 FILE_SIZES=("128K" "1M" "10M")
 
-######################## first run ###########################
+######################## FIRST RUN ###########################
 
-#echo -e "adding 1st run traffic control rules to $INTF_1...\n"
-#sudo tc qdisc add dev eno1 root netem delay ${INTF2_RTTS[0]}ms loss $PACKET_LOSS%
-#tc qdisc show dev $INTF_1
-#
-#echo -e "\ncapturing traffing on $INTF_1...\n"
-#sudo tcpdump -i $INTF_3 -w "$INTF_1-$INTF1_RTT-${FILE_SIZES[0]}.pcap" &
-#
-## TODO capture interface 2
-#
-#echo -e "starting iperf: connecting to $IP_1, sending size ${FILE_SIZES[0]}...\n"
-#iperf3 -c $IP_1 -B $IP_1 -f m -n ${FILE_SIZES[0]} -b 1000M --logfile "iperf-${RATIOS[0]}-${FILE_SIZES[0]}.txt"
-#
-#
-#echo -e "pausing to ensure capture...\n"
-#sleep 2
-#
-## stop capture
-#echo -e "stopping tcpdump...\n"
-#sudo pkill tcpdump
+# TEST
+#echo "adding constant traffic control rules to $INTF_LO..."
+#sudo tc qdisc add dev $INTF_LO root netem delay $INTF1_RTT loss $PACKET_LOSS%
+#tc qdisc show dev $INTF_LO
 
+echo "adding constant traffic control rules to $INTF_1..."
+sudo tc qdisc add dev $INTF_1 root netem delay $INTF1_RTT loss $PACKET_LOSS%
+tc qdisc show dev $INTF_1
 
-##################### remaining runs ##########################
+echo "adding constant traffic control rules to $INTF_2..."
+sudo tc qdisc add dev $INTF_2 root netem delay ${INTF2_RTTS[0]} loss $PACKET_LOSS%
+tc qdisc show dev $INTF_2
+
+for (( run=1; run<=$RUNS_PER_TEST; run++ )); do
+    echo -e "\n\nSTARTING RUN $run: ${INTF2_RTTS[0]} delay on $INTF_2, ${FILE_SIZES[0]}\n\n"
+
+    # TEST lo
+    #echo "capturing traffing on $INTF_LO..."
+    #sudo tcpdump -i $INTF_LO -w "$INTF_LO-run_$run-$INTF1_RTT-${FILE_SIZES[0]}.pcap" &
+
+    echo "capturing traffing on $INTF_1..."
+    sudo tcpdump -i $INTF_1 -w "$INTF_1-run_$run-$INTF1_RTT-${FILE_SIZES[0]}.pcap" &
+
+    echo "capturing traffing on $INTF_2..."
+    sudo tcpdump -i $INTF_2 -w "$INTF_2-run_$run-${INTF2_RTTS[0]}-${FILE_SIZES[0]}.pcap" &
+
+    # TEST lo
+    #echo "starting iperf: connecting to $IP_LO, sending size ${FILE_SIZES[0]}..."
+    #iperf3 -c $IP_LO -B $IP_LO -f m -n ${FILE_SIZES[0]} -b 1000M --logfile "iperf-run_$run-${INTF1_RTT}-${INTF2_RTTS[0]}-${FILE_SIZES[0]}.txt"
+
+    echo "starting iperf: connecting to $IP_SERVER, sending size ${FILE_SIZES[0]}..."
+    iperf3 -c $IP_SERVER -B $PRIMARY_PATH -f m -n ${FILE_SIZES[0]} -b 1000M --logfile "iperf-run_$run-$INTF1_RTT-${INTF2_RTTS[0]}-${FILE_SIZES[0]}.txt"
+
+    echo "pausing to ensure capture..."
+    sleep 3
+
+    # stop capture
+    echo "stopping tcpdump..."
+    sudo pkill tcpdump
+done
+
+##################### REMAINING RUNS ##########################
 
 len_rtts=${#INTF2_RTTS[@]}
 len_sizes=${#FILE_SIZES[@]}
 
-# TODO: change to INTF_2
+# Start withn 2nd rtt value
 for (( rtt=1; rtt<$len_rtts; rtt++ )); do
-    echo -e "test run: ${INTF2_RTTS[rtt]}ms delay, ${FILE_SIZES[size]}\n"
+    for (( size=0; size<len_sizes; size++ )); do
 
-    for (( size=1; size<len_sizes; size++ )); do
-        echo -e "adding traffic control rules to $INTF_1...\n"
-        sudo tc qdisc add dev eno1 root netem delay ${INTF2_RTTS[$rtt]}ms loss $PACKET_LOSS%
-        tc qdisc show dev $INTF_1
+        # TEST
+        #echo "change traffic control rules on $INTF_LO..."
+        #sudo tc qdisc change dev $INTF_LO root netem delay ${INTF2_RTTS[$rtt]} loss $PACKET_LOSS%
+        #tc qdisc show dev $INTF_LO
 
-        # TODO: change to INTF_1
-        echo -e "\ncapturing traffing on $INTF_1...\n"
-        sudo tcpdump -i $INTF_LO -w "$INTF_LO-$INTF1_RTT-${FILE_SIZES[0]}.pcap" &
+        echo "change traffic control rules on $INTF_2..."
+        sudo tc qdisc change dev $INTF_2 root netem delay ${INTF2_RTTS[$rtt]} loss $PACKET_LOSS%
+        tc qdisc show dev $INTF_2
 
-        # TODO: listen to INTF_2
+        for (( run=1; run<=$RUNS_PER_TEST; run++ )); do
+            echo -e "\n\nSTARTING RUN $run: ${INTF2_RTTS[$rtt]} delay on $INTF_2, ${FILE_SIZES[$size]}\n\n"
 
-        echo -e "starting iperf: connecting to $IP_1, sending size ${FILE_SIZES[0]}...\n"
-        iperf3 -c $IP_LO -B $IP_LO -f m -n ${FILE_SIZES[0]} -b 1000M --logfile "iperf-${RATIOS[0]}-${FILE_SIZES[0]}.txt"
+            # TEST lo
+            #echo "capturing traffing on $INTF_LO..."
+            #sudo tcpdump -i $INTF_LO -w "$INTF_LO-run_$run-$INTF1_RTT-${FILE_SIZES[$size]}.pcap" &
 
-        echo -e "stopping tcpdump...\n"
-        sudo pkill tcpdump
+            echo "capturing traffing on $INTF_1..."
+            sudo tcpdump -i $INTF_1 -w "$INTF_1-run_$run-$INTF1_RTT-${FILE_SIZES[$size]}.pcap" &
+
+            echo "capturing traffing on $INTF_2..."
+            sudo tcpdump -i $INTF_2 -w "$INTF_2-run_$run-${INTF2_RTTS[$rtt]}-${FILE_SIZES[$size]}.pcap" &
+
+            # TEST lo
+#            echo "starting iperf: connecting to $IP_LO, sending size ${FILE_SIZES[$size]}..."
+#            iperf3 -c $IP_LO -B $IP_LO -f m -n ${FILE_SIZES[$size]} -b 1000M --logfile "iperf-run_$run-$INTF1_RTT-${INTF2_RTTS[$rtt]}-${FILE_SIZES[$size]}.txt"
+
+            echo "starting iperf: connecting to $IP_SERVER, sending size ${FILE_SIZES[$size]}..."
+            iperf3 -c $IP_SERVER -B $PRIMARY_PATH -f m -n ${FILE_SIZES[$size]} -b 1000M --logfile "iperf-run_$run-$INTF1_RTT-${INTF2_RTTS[$rtt]}-${FILE_SIZES[$size]}.txt"
+
+            echo "pausing to ensure capture..."
+            sleep 3
+
+            echo "stopping tcpdump..."
+            sudo pkill tcpdump
+        done
     done
 done
 
-
-
 ######################### end #################################
 
-#echo "removing traffic control rules"
-#sudo tc qdisc del dev $INTF_1 root netem
-#tc qdisc show dev $INTF_1
+# TEST lo
+#echo -e "\nremoving traffic control rules\n"
+#sudo tc qdisc del dev $INTF_LO root netem
+#tc qdisc show dev $INTF_LO
 
-echo "program ending"
+echo -e "\nremoving traffic control rules from $INTF_1\n"
+sudo tc qdisc del dev $INTF_1 root netem
+tc qdisc show dev $INTF_1
+
+echo -e "\nremoving traffic control rules from $INTF_2\n"
+sudo tc qdisc del dev $INTF_2 root netem
+tc qdisc show dev $INTF_2
+
+echo -e "\n\nprogram ending"
