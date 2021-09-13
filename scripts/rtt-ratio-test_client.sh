@@ -31,6 +31,8 @@ FILE_SIZES=("128K" "1M" "10M")
 
 ######################## FIRST RUN ###########################
 
+len_sizes=${#FILE_SIZES[@]}
+
 # TEST
 #echo "adding constant traffic control rules to $INTF_LO..."
 #sudo tc qdisc add dev $INTF_LO root netem delay $INTF1_RTT loss $PACKET_LOSS%
@@ -53,17 +55,18 @@ for (( run=1; run<=$RUNS_PER_TEST; run++ )); do
 	    #sudo tcpdump -i $INTF_LO -w "$INTF_LO-run_$run-$INTF1_RTT-${FILE_SIZES[0]}.pcap" &
 
 	    echo "capturing traffing on $INTF_1..."
-	    sudo tcpdump -i $INTF_1 -w "$INTF_1-run_$run-$INTF1_RTT-${FILE_SIZES[$size]}.pcap" &
+	    sudo tcpdump -i $INTF_1 -w "$INTF_1-run_$run-$INTF1_RTT-${INTF2_RTTS[0]}-${FILE_SIZES[$size]}.pcap" &
+        
 
 	    echo "capturing traffing on $INTF_2..."
-	    sudo tcpdump -i $INTF_2 -w "$INTF_2-run_$run-${INTF2_RTTS[0]}-${FILE_SIZES[$size]}.pcap" &
+	    sudo tcpdump -i $INTF_2 -w "$INTF_2-run_$run-$INTF1_RTT-${INTF2_RTTS[0]}-${FILE_SIZES[$size]}.pcap" &
 
 	    # TEST lo
 	    #echo "starting iperf: connecting to $IP_LO, sending size ${FILE_SIZES[0]}..."
 	    #iperf3 -c $IP_LO -B $IP_LO -f m -n ${FILE_SIZES[0]} -b 1000M --logfile "iperf-run_$run-${INTF1_RTT}-${INTF2_RTTS[0]}-${FILE_SIZES[0]}.txt"
 
 	    echo "starting iperf: connecting to $IP_SERVER, sending size ${FILE_SIZES[$size]}..."
-	    iperf3 -c $IP_SERVER -B $PRIMARY_PATH -f m -n ${FILE_SIZES[0]} -b 1000M --logfile "iperf-run_$run-$INTF1_RTT-${INTF2_RTTS[0]}-${FILE_SIZES[0]}.txt"
+	    iperf3 -c $IP_SERVER -B $PRIMARY_PATH -f m -n ${FILE_SIZES[$size]} -b 1000M --logfile "iperf-run_$run-$INTF1_RTT-${INTF2_RTTS[0]}-${FILE_SIZES[$size]}.txt"
 
 	    echo "pausing to ensure capture..."
 	    sleep 3
@@ -77,7 +80,6 @@ done
 ##################### REMAINING RUNS ##########################
 
 len_rtts=${#INTF2_RTTS[@]}
-len_sizes=${#FILE_SIZES[@]}
 
 # Start withn 2nd rtt value
 for (( rtt=1; rtt<$len_rtts; rtt++ )); do
@@ -100,14 +102,14 @@ for (( rtt=1; rtt<$len_rtts; rtt++ )); do
             #sudo tcpdump -i $INTF_LO -w "$INTF_LO-run_$run-$INTF1_RTT-${FILE_SIZES[$size]}.pcap" &
 
             echo "capturing traffing on $INTF_1..."
-            sudo tcpdump -i $INTF_1 -w "$INTF_1-run_$run-$INTF1_RTT-${FILE_SIZES[$size]}.pcap" &
+            sudo tcpdump -i $INTF_1 -w "$INTF_1-run_$run-$INTF1_RTT-${INTF2_RTTS[$rtt]}-${FILE_SIZES[$size]}.pcap" &
 
             echo "capturing traffing on $INTF_2..."
-            sudo tcpdump -i $INTF_2 -w "$INTF_2-run_$run-${INTF2_RTTS[$rtt]}-${FILE_SIZES[$size]}.pcap" &
+            sudo tcpdump -i $INTF_2 -w "$INTF_2-run_$run-$INTF1_RTT-${INTF2_RTTS[$rtt]}-${FILE_SIZES[$size]}.pcap" &
 
             # TEST lo
-#            echo "starting iperf: connecting to $IP_LO, sending size ${FILE_SIZES[$size]}..."
-#            iperf3 -c $IP_LO -B $IP_LO -f m -n ${FILE_SIZES[$size]} -b 1000M --logfile "iperf-run_$run-$INTF1_RTT-${INTF2_RTTS[$rtt]}-${FILE_SIZES[$size]}.txt"
+            #echo "starting iperf: connecting to $IP_LO, sending size ${FILE_SIZES[$size]}..."
+            #iperf3 -c $IP_LO -B $IP_LO -f m -n ${FILE_SIZES[$size]} -b 1000M --logfile "iperf-run_$run-$INTF1_RTT-${INTF2_RTTS[$rtt]}-${FILE_SIZES[$size]}.txt"
 
             echo "starting iperf: connecting to $IP_SERVER, sending size ${FILE_SIZES[$size]}..."
             iperf3 -c $IP_SERVER -B $PRIMARY_PATH -f m -n ${FILE_SIZES[$size]} -b 1000M --logfile "iperf-run_$run-$INTF1_RTT-${INTF2_RTTS[$rtt]}-${FILE_SIZES[$size]}.txt"
