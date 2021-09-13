@@ -7,12 +7,13 @@ RUNS_PER_TEST=1
 
 # interfaces and ip addresses
 INTF_1="eno1"
-IP_1="10.18.17.15"
+IP_1="10.18.17.140"
 
 INTF_2="enp7s0"
-IP_2="10.18.18.15"
+IP_2="10.18.18.140"
 
-IP_SERVER="10.18.17.140"
+# kimjo-1 eno1
+IP_SERVER="10.18.17.15"
 
 INTF_LO="lo" # for testing
 IP_LO="127.0.0.1" # for testing
@@ -44,31 +45,33 @@ sudo tc qdisc add dev $INTF_2 root netem delay ${INTF2_RTTS[0]} loss $PACKET_LOS
 tc qdisc show dev $INTF_2
 
 for (( run=1; run<=$RUNS_PER_TEST; run++ )); do
-    echo -e "\n\nSTARTING RUN $run: ${INTF2_RTTS[0]} delay on $INTF_2, ${FILE_SIZES[0]}\n\n"
+    for (( size=0; size<len_sizes; size++ )); do
+	    echo -e "\n\nSTARTING RUN $run: ${INTF2_RTTS[0]} delay on $INTF_2, ${FILE_SIZES[$size]}\n\n"
 
-    # TEST lo
-    #echo "capturing traffing on $INTF_LO..."
-    #sudo tcpdump -i $INTF_LO -w "$INTF_LO-run_$run-$INTF1_RTT-${FILE_SIZES[0]}.pcap" &
+	    # TEST lo
+	    #echo "capturing traffing on $INTF_LO..."
+	    #sudo tcpdump -i $INTF_LO -w "$INTF_LO-run_$run-$INTF1_RTT-${FILE_SIZES[0]}.pcap" &
 
-    echo "capturing traffing on $INTF_1..."
-    sudo tcpdump -i $INTF_1 -w "$INTF_1-run_$run-$INTF1_RTT-${FILE_SIZES[0]}.pcap" &
+	    echo "capturing traffing on $INTF_1..."
+	    sudo tcpdump -i $INTF_1 -w "$INTF_1-run_$run-$INTF1_RTT-${FILE_SIZES[$size]}.pcap" &
 
-    echo "capturing traffing on $INTF_2..."
-    sudo tcpdump -i $INTF_2 -w "$INTF_2-run_$run-${INTF2_RTTS[0]}-${FILE_SIZES[0]}.pcap" &
+	    echo "capturing traffing on $INTF_2..."
+	    sudo tcpdump -i $INTF_2 -w "$INTF_2-run_$run-${INTF2_RTTS[0]}-${FILE_SIZES[$size]}.pcap" &
 
-    # TEST lo
-    #echo "starting iperf: connecting to $IP_LO, sending size ${FILE_SIZES[0]}..."
-    #iperf3 -c $IP_LO -B $IP_LO -f m -n ${FILE_SIZES[0]} -b 1000M --logfile "iperf-run_$run-${INTF1_RTT}-${INTF2_RTTS[0]}-${FILE_SIZES[0]}.txt"
+	    # TEST lo
+	    #echo "starting iperf: connecting to $IP_LO, sending size ${FILE_SIZES[0]}..."
+	    #iperf3 -c $IP_LO -B $IP_LO -f m -n ${FILE_SIZES[0]} -b 1000M --logfile "iperf-run_$run-${INTF1_RTT}-${INTF2_RTTS[0]}-${FILE_SIZES[0]}.txt"
 
-    echo "starting iperf: connecting to $IP_SERVER, sending size ${FILE_SIZES[0]}..."
-    iperf3 -c $IP_SERVER -B $PRIMARY_PATH -f m -n ${FILE_SIZES[0]} -b 1000M --logfile "iperf-run_$run-$INTF1_RTT-${INTF2_RTTS[0]}-${FILE_SIZES[0]}.txt"
+	    echo "starting iperf: connecting to $IP_SERVER, sending size ${FILE_SIZES[$size]}..."
+	    iperf3 -c $IP_SERVER -B $PRIMARY_PATH -f m -n ${FILE_SIZES[0]} -b 1000M --logfile "iperf-run_$run-$INTF1_RTT-${INTF2_RTTS[0]}-${FILE_SIZES[0]}.txt"
 
-    echo "pausing to ensure capture..."
-    sleep 3
+	    echo "pausing to ensure capture..."
+	    sleep 3
 
-    # stop capture
-    echo "stopping tcpdump..."
-    sudo pkill tcpdump
+	    # stop capture
+	    echo "stopping tcpdump..."
+	    sudo pkill tcpdump
+    done
 done
 
 ##################### REMAINING RUNS ##########################
@@ -125,11 +128,11 @@ done
 #sudo tc qdisc del dev $INTF_LO root netem
 #tc qdisc show dev $INTF_LO
 
-echo -e "\nremoving traffic control rules from $INTF_1\n"
+echo -e "\nremoving traffic control rules from $INTF_1"
 sudo tc qdisc del dev $INTF_1 root netem
 tc qdisc show dev $INTF_1
 
-echo -e "\nremoving traffic control rules from $INTF_2\n"
+echo -e "\nremoving traffic control rules from $INTF_2"
 sudo tc qdisc del dev $INTF_2 root netem
 tc qdisc show dev $INTF_2
 
