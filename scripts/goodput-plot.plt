@@ -6,7 +6,7 @@
 FILE = "rtt-ratio-goodput.dat"
 set terminal wxt size 800,800
 
-set title "Goodput as Path 2 Delay Increases - 0.1% packet loss, cubic, minRTT scheduler"
+set title "Goodput as Path 2 Delay Increases - 0.1% packet loss, OLIA, minRTT scheduler"
 set ylabel "Goodput [Mbit/sec]"
 set style data linespoints
 set key right top 
