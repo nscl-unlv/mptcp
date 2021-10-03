@@ -3,41 +3,39 @@
 # Script to run IPERF and TCPDUMP
 
 # HOW MANY ROUNDS PER TEST
-RUNS_PER_TEST=2
+RUNS_PER_TEST=10
 
 # interfaces and ip addresses
-#INTF_1="eno1"
-#IP_1="10.18.17.140"
-INTF_1="lo"
-IP_1="127.0.0.1"
+# kimjo-2
+INTF_1="eno1"
+IP_1="10.18.17.140"
+#INTF_1="lo"
+#IP_1="127.0.0.1"
 
 # kimjo-1 eno1
-#IP_SERVER="10.18.17.15"
-IP_SERVER="127.0.0.1"
+IP_SERVER="10.18.17.15"
+#IP_SERVER="127.0.0.1"
 
 # CONSTANTS
 PACKET_LOSS=0.1
 PRIMARY_PATH=$IP_1
 
 # delay settings
-#INTF1_RTTS=("0ms"  "10ms" "20ms" "50ms" "100ms" "200ms" "300ms" "500ms" "1000ms")
-INTF1_RTTS=("0ms"  "10ms" "20ms")
+INTF1_RTTS=("0ms"  "10ms" "20ms" "50ms" "100ms" "200ms" "300ms" "500ms" "1000ms")
 
 # file sizes
 FILE_SIZES=("128K" "1M" "10M")
 
 # congestion algorithms
 # ensure to have algorithms pre-loaded with modprobe
-#CCAS=("cubic" "bbr" "bic" "hybla"  "veno" "vegas")
-CCAS=("cubic" "bbr" "bic")
+CCAS=("cubic" "bbr" "bic" "hybla"  "veno" "vegas")
 
 ######################## EXECUTE RUNS ###########################
 len_rtts=${#INTF1_RTTS[@]}
 len_sizes=${#FILE_SIZES[@]}
 len_ccas=${#CCAS[@]}
 
-SYSCTL=/sbin/sysctl
-
+# loop through congestion algorithms
 for (( cca=0; cca<$len_ccas; cca++ )); do
 
     echo "changing congestion control algorithm"
@@ -47,7 +45,9 @@ for (( cca=0; cca<$len_ccas; cca++ )); do
     echo "creating directory $cca_dir..."
     mkdir $cca_dir
 
+    # loop through delays
     for (( rtt=0; rtt<$len_rtts; rtt++ )); do
+        # loop through file sizes
         for (( size=0; size<$len_sizes; size++ )); do
             echo "change traffic control rules on $INTF_1..."
             sudo tc qdisc add dev $INTF_1 root netem delay ${INTF1_RTTS[$rtt]} loss $PACKET_LOSS%
