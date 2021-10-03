@@ -28,7 +28,7 @@ FILE_SIZES=("128K" "1M" "10M")
 
 # congestion algorithms
 # ensure to have algorithms pre-loaded with modprobe
-CCAS=("cubic" "bbr" "bic" "hybla"  "veno" "vegas")
+CCAS=("cubic" "bbr" "bic" "hybla" "reno" "veno" "vegas")
 
 ######################## EXECUTE RUNS ###########################
 len_rtts=${#INTF1_RTTS[@]}
