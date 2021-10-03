@@ -3,7 +3,7 @@
 # Script to run IPERF and TCPDUMP
 
 # HOW MANY ROUNDS PER TEST
-RUNS_PER_TEST=1
+RUNS_PER_TEST=2
 
 # interfaces and ip addresses
 #INTF_1="eno1"
@@ -20,14 +20,16 @@ PACKET_LOSS=0.1
 PRIMARY_PATH=$IP_1
 
 # delay settings
-INTF1_RTTS=("0ms"  "10ms" "20ms" "50ms" "100ms" "200ms" "300ms" "500ms" "1000ms")
+#INTF1_RTTS=("0ms"  "10ms" "20ms" "50ms" "100ms" "200ms" "300ms" "500ms" "1000ms")
+INTF1_RTTS=("0ms"  "10ms" "20ms")
 
 # file sizes
 FILE_SIZES=("128K" "1M" "10M")
 
 # congestion algorithms
 # ensure to have algorithms pre-loaded with modprobe
-CCAS=("cubic" "bbr" "bic" "hybla"  "veno" "vegas")
+#CCAS=("cubic" "bbr" "bic" "hybla"  "veno" "vegas")
+CCAS=("cubic" "bbr" "bic")
 
 ######################## EXECUTE RUNS ###########################
 len_rtts=${#INTF1_RTTS[@]}
