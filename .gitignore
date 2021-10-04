@@ -4,3 +4,4 @@ results/
 test-data
 __pycache__
 data/
+.DS_Store
