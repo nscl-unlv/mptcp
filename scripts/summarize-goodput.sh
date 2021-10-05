@@ -20,8 +20,9 @@ for cca in */ ; do
             bsum=$(echo "$bsum + $bitrate" | bc)
         done # end run
 
-        #echo "bsum: $bsum"
         bavg=$(echo "$bsum/$TOTAL_RUNS" | bc -l)
-        printf "%.2f\n" $bavg
+
+        label=$(echo $rtt_size | sed 's/[/|-]/ /g')
+        printf "$label %.2f\n" $bavg
     done # end rtt_size
 done # end cca
