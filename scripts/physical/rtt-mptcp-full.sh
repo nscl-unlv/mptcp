@@ -12,7 +12,7 @@ IP_1="10.18.17.140"
 #INTF_1="lo"
 #IP_1="127.0.0.1"
 INTF_2="enp7s0"
-IP_1="10.18.18.140"
+IP_2="10.18.18.140"
 
 # kimjo-1 eno1
 IP_SERVER="10.18.17.15"
@@ -30,7 +30,7 @@ FILE_SIZES=("128K" "1M" "10M")
 
 # congestion algorithms
 # ensure to have algorithms pre-loaded with modprobe
-CCAS=("cubic" "balia" "bbr" "bic" "hybla" "olia" "reno" "veno" "vegas" "wvegas")
+CCAS=("cubic" "balia" "bbr" "bic" "hybla" "lia" "olia" "reno" "veno" "vegas" "wvegas")
 
 ######################## EXECUTE RUNS ###########################
 len_rtts=${#INTF_RTTS[@]}
