@@ -112,7 +112,6 @@ def under_testing():
 
     time.sleep(5)  # wait (a bit) to finish
 
-
 def start_test():
     ''' start iperf3 test '''
 
