@@ -22,7 +22,6 @@ IP_SERVER="10.18.17.15"
 PACKET_LOSS=0.1
 PRIMARY_PATH=$IP_1
 TIME_INTERVAL=1
-BANDWIDTH="1000M"
 
 # delay settings
 INTF_RTTS=("10ms" "20ms" "50ms" "100ms" "200ms" "300ms" "500ms" "1000ms")
@@ -64,7 +63,7 @@ for (( cca=0; cca<$len_ccas; cca++ )); do
 
             echo "starting iperf: connecting to $IP_SERVER..."
             iperf3 -c $IP_SERVER -B $PRIMARY_PATH -f m \
-                -i $TIME_INTERVAL -b $BANDWIDTH \
+                -i $TIME_INTERVAL
                 --logfile "$cca_dir/$rtt_dir/iperf-run_$run-${INTF_RTTS[$rtt]}.txt"
 
             echo "pausing to ensure capture..."
