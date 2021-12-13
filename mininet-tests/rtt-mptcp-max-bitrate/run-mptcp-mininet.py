@@ -24,7 +24,6 @@ queues (TSQ), thus does not emulate MPTCP correctly.  Source: Mininet/Netem
 Emulation Pitfalls by Alexander Frommgen.
 """
 
-import config
 import time
 from mininet.cli import CLI
 from mininet.net import Mininet
@@ -38,8 +37,14 @@ DELAY = sys.argv[1]
 # Packet loss
 LOSS = 0.1
 
+# interface bandwidth
+BANDWIDTH = 1000
+
 # Iperf3 summary file name
 OUTPUT_FILE="output.txt"
+
+# Test time in seconds
+TIME = 11
 
 net = Mininet(cleanup=True)
 
@@ -58,9 +63,9 @@ net.addLink(h1, s4, cls=TCLink)
 
 # add links to host-2
 net.addLink(h2, s3, cls=TCLink,
-            loss=LOSS)
+            bw=BANDWIDTH, loss=LOSS)
 net.addLink(h2, s4, cls=TCLink,
-            delay=DELAY, loss=LOSS)
+            bw=BANDWIDTH, delay=DELAY, loss=LOSS)
 
 h1.setIP('10.0.1.1', intf='h1-eth0')
 h1.setIP('10.0.1.2', intf='h1-eth1')
@@ -101,6 +106,8 @@ def start_test():
     h1.cmd(f'iperf3 -t 1.0 '
            f'-f m -i 1.0 -c {h2.IP()} '
            f'> {OUTPUT_FILE} &')
+
+    time.sleep(TIME) # iperf runs for 10 seconds
 
 
 net.start()

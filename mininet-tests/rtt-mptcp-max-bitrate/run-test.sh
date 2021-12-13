@@ -2,13 +2,12 @@
 
 # Script to run mininet and iperf test
 
-ROOT=$(pwd)
 EXEC_FILE="run-mptcp-mininet.py"
 PY3_CMD=$(which python3)
 IPERF_FILE="output.txt"
 
 # How many rounds per test
-RUNS_PER_TEST=5
+RUNS_PER_TEST=10
 
 # delay settings
 INTF_RTTS=("0ms" "10ms" "20ms" "50ms" "100ms" "200ms" "300ms" "500ms" "1000ms")
@@ -44,13 +43,10 @@ for (( cca=0; cca<$len_ccas; cca++ )); do
             echo -e "\n\nSTARTING RUN $run: ${INTF_RTTS[$rtt]} delay on eth1\n\n"
 
             # execute mininet
-            sudo $PY3_CMD $ROOT/$TEST_FILE ${INTF_RTTS[$rtt]}
+            sudo $PY3_CMD $EXEC_FILE ${INTF_RTTS[$rtt]}
 
             # move output.txt
             mv $IPERF_FILE $cca_dir/$rtt_dir/iperf-run_$run-${INTF_RTTS[$rtt]}
-
-            echo "pausing to ensure capture..."
-            sleep 3
         done # end run
     done # end rtt
 done # end cca
