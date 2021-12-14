@@ -7,7 +7,8 @@ PY3_CMD=$(which python3)
 IPERF_FILE="output.txt"
 
 # How many rounds per test
-RUNS_PER_TEST=10
+#RUNS_PER_TEST=10
+RUNS_PER_TEST=1
 
 # delay settings
 INTF_RTTS=("0ms" "10ms" "20ms" "50ms" "100ms" "200ms" "300ms" "500ms" "1000ms")
