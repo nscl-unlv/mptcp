@@ -64,6 +64,7 @@ net.addLink(h1, s4, cls=TCLink)
 # add links to host-2
 net.addLink(h2, s3, cls=TCLink,
             bw=BANDWIDTH, loss=LOSS)
+# delay ONLY on Path 2
 net.addLink(h2, s4, cls=TCLink,
             bw=BANDWIDTH, delay=DELAY, loss=LOSS)
 

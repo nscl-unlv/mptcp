@@ -7,15 +7,14 @@ PY3_CMD=$(which python3)
 IPERF_FILE="output.txt"
 
 # How many rounds per test
-#RUNS_PER_TEST=10
-RUNS_PER_TEST=1
+RUNS_PER_TEST=5
 
 # delay settings
 INTF_RTTS=("0ms" "10ms" "20ms" "50ms" "100ms" "200ms" "300ms" "500ms" "1000ms")
 
 # congestion algorithms
 # ensure to have algorithms pre-loaded with modprobe
-#CCAS=("cubic" "balia" "bbr" "bic" "hybla" "lia" "olia" "reno" "veno" "vegas" "wvegas")
+# available: "cubic" "balia" "bbr" "bic" "hybla" "lia" "olia" "reno" "veno" "vegas" "wvegas"
 CCAS=("cubic" "bbr" "bic" "lia" "vegas")
 
 ######################## EXECUTE RUNS ###########################
